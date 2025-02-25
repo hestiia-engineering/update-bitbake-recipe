@@ -5,7 +5,7 @@ inputs:
     description: "Git Token with write permissions to the Yocto meta repository."
     required: true
   yocto_repository:
-    description: "The URL of the Yocto meta repository."
+    description: "The name of the Yocto meta repository within the configured organization."
     required: true
   yocto_branch:
     description: "The branch of the Yocto meta repository to update."

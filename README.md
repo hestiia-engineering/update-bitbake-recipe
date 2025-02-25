@@ -32,7 +32,7 @@ jobs:
 | Input              | Description                                                                            | Required | Default               |
 |--------------------|----------------------------------------------------------------------------------------|----------|-----------------------|
 | `git_token`        | Git Token with write permissions to the Yocto meta repository.                         | Yes      |                       |
-| `yocto_repository` | The URL (or repository name) of the Yocto meta repository.                             | Yes      |                       |
+| `yocto_repository` | The name of the Yocto meta repository within the configured organization.              | Yes      |                       |
 | `yocto_branch`     | The branch of the Yocto meta repository to update.                                     | Yes      |                       |
 | `organization`     | The organization of the Yocto meta repository.                                         | Yes      |                       |
 | `recipe_path`      | The path to the folder in the Yocto meta repository where the recipe is located.       | Yes      |                       |
