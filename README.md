@@ -23,6 +23,8 @@ jobs:
           yocto_branch: "develop"
           organization: "hestiia-engineering"
           recipe_path: "meta-myeko/meta-myeko-pro/recipes-myeko-pro"
+          author: "yocto-action[bot] <it@hestiia.com>"
+          committer: "yocto-action[bot] <it@hestiia.com>"
 ```
 
 ## Inputs
@@ -32,8 +34,10 @@ jobs:
 | `git_token`        | Git Token with write permissions to the Yocto meta repository.                         | Yes      |                       |
 | `yocto_repository` | The URL (or repository name) of the Yocto meta repository.                             | Yes      |                       |
 | `yocto_branch`     | The branch of the Yocto meta repository to update.                                     | Yes      |                       |
-| `organization`     | The organization of the Yocto meta repository.                                         | Yes      | `hestiia-engineering` |
+| `organization`     | The organization of the Yocto meta repository.                                         | Yes      |                       |
 | `recipe_path`      | The path to the folder in the Yocto meta repository where the recipe is located.       | Yes      |                       |
+| `author`           | The author of the pull request.                                                        | Yes      |                       |
+| `committer`        | The committer of the pull request.                                                     | Yes      |                       |
 
 ## How It Works
 
