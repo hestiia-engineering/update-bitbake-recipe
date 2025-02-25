@@ -1,0 +1,83 @@
+name: "Update BitBake Recipe"
+description: "Automatically update a BitBake recipe in a Yocto meta repository based on a Rust project."
+inputs:
+  git_token:
+    description: "Git Token with write permissions to the Yocto meta repository."
+    required: true
+  yocto_repository:
+    description: "The URL of the Yocto meta repository."
+    required: true
+  yocto_branch:
+    description: "The branch of the Yocto meta repository to update."
+    required: true
+  organization:
+    description: "The organization of the Yocto meta repository."
+    required: true
+    default: "hestiia-engineering"
+  recipe_path:
+    description: "The path to the folder in the Yocto meta repository where the recipe is located."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # Check out the application code.
+    - name: Checkout Application
+      uses: actions/checkout@v3
+
+    # Set up the Rust toolchain.
+    - name: Setup Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+    
+    # Extract the package info.
+    - name: Extract package name and title from Cargo.toml
+      run: |
+        package_name=$(cargo read-manifest | jq -r .name)
+        package_version=$(cargo read-manifest | jq -r .version)
+        
+        if [ -z "$package_name" ] || [ -z "$package_version" ]; then
+          echo "Error: Could not extract package info from Cargo.toml" >&2
+          exit 1
+        fi
+        
+        package_title=$(echo "$package_name" | tr '-' ' ' | awk '{for (i=1;i<=NF;i++) { $i=toupper(substr($i,1,1)) substr($i,2) } print}')
+        
+        echo "PACKAGE_NAME=$package_name" >> $GITHUB_ENV
+        echo "PACKAGE_TITLE=$package_title" >> $GITHUB_ENV
+        echo "PACKAGE_VERSION=$package_version" >> $GITHUB_ENV
+
+    # Generate the BitBake file using cargo bitbake.
+    - name: Generate BitBake file
+      run: |
+        cargo install --locked cargo-bitbake
+        cargo bitbake
+
+    # Check out the Yocto meta repository.
+    - name: Checkout Yocto Meta Repo
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ inputs.organization }}/${{ inputs.yocto_repository }}
+        token: ${{ inputs.git_token }}
+        path: ${{ inputs.yocto_repository }}
+
+    # Copy the generated BitBake file into the desired recipe folder.
+    - name: Copy generated BitBake file to recipe
+      run: |
+        rm -f ${{ inputs.yocto_repository }}/${{ inputs.recipe_path }}/${{ env.PACKAGE_NAME }}/*.bb
+        cp *.bb ${{ inputs.yocto_repository }}/${{ inputs.recipe_path }}/${{ env.PACKAGE_NAME }}/
+
+    # Create a pull request with the updated recipe.
+    - name: Create Pull Request for Updated Recipe
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ inputs.git_token }}
+        commit-message: "fix[${{ env.PACKAGE_NAME }}]: update to ${{ env.PACKAGE_VERSION }}"
+        branch: update-${{ env.PACKAGE_NAME }}-bitbake-recipe-${{ env.PACKAGE_VERSION }}
+        title: "Update ${{ env.PACKAGE_TITLE }} BitBake recipe for release ${{ env.PACKAGE_VERSION }}"
+        body: "Automatically generated update for ${{ env.PACKAGE_TITLE }} BitBake recipe based on release ${{ env.PACKAGE_VERSION }}."
+        base: ${{ inputs.yocto_branch }}
+        path: ${{ inputs.yocto_repository }}
+        committer: yocto-action[bot] <it@hestiia.com>
+        author: yocto-action[bot] <it@hestiia.com>
