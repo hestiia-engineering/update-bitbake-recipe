@@ -81,7 +81,7 @@ runs:
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ inputs.git_token }}
-        commit-message: "fix[${{ env.PACKAGE_NAME }}]: update to ${{ env.PACKAGE_VERSION }}"
+        commit-message: "fix(${{ env.PACKAGE_NAME }}): update to ${{ env.PACKAGE_VERSION }}"
         branch: update-${{ env.PACKAGE_NAME }}-bitbake-recipe-${{ env.PACKAGE_VERSION }}
         title: "Update ${{ env.PACKAGE_TITLE }} BitBake recipe for release ${{ env.PACKAGE_VERSION }}"
         body: "Automatically generated update for ${{ env.PACKAGE_TITLE }} BitBake recipe based on release ${{ env.PACKAGE_VERSION }}."
