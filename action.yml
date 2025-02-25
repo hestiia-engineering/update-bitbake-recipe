@@ -52,12 +52,14 @@ runs:
         echo "PACKAGE_NAME=$package_name" >> $GITHUB_ENV
         echo "PACKAGE_TITLE=$package_title" >> $GITHUB_ENV
         echo "PACKAGE_VERSION=$package_version" >> $GITHUB_ENV
+      shell: sh
 
     # Generate the BitBake file using cargo bitbake.
     - name: Generate BitBake file
       run: |
         cargo install --locked cargo-bitbake
         cargo bitbake
+      shell: sh
 
     # Check out the Yocto meta repository.
     - name: Checkout Yocto Meta Repo
@@ -72,6 +74,7 @@ runs:
       run: |
         rm -f ${{ inputs.yocto_repository }}/${{ inputs.recipe_path }}/${{ env.PACKAGE_NAME }}/*.bb
         cp *.bb ${{ inputs.yocto_repository }}/${{ inputs.recipe_path }}/${{ env.PACKAGE_NAME }}/
+      shell: sh
 
     # Create a pull request with the updated recipe.
     - name: Create Pull Request for Updated Recipe
