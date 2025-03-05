@@ -59,6 +59,14 @@ runs:
       run: |
         cargo install --locked cargo-bitbake
         cargo bitbake
+
+        # Remove git references to fix the recipe.
+        for BITBAKE_FILE in *.bb; do
+          sed -i '/git.*\\/d' "$BITBAKE_FILE"
+          sed -i '/SRCREV_FORMAT \.= "_/d' "$BITBAKE_FILE"
+          sed -i '/SRCREV_[^ ]* = "/d' "$BITBAKE_FILE"
+          sed -i '/EXTRA_OECARGO_PATHS \+= "\${WORKDIR}\/[^"]*"/d' "$BITBAKE_FILE"
+        done
       shell: sh
 
     # Check out the Yocto meta repository.
