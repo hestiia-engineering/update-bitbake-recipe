@@ -69,6 +69,13 @@ runs:
     - name: Generate BitBake file
       if: inputs.method == 'meta-rust-bin'
       run: |
+        # Check if .cargo/config.toml exists
+        if [ -f ".cargo/config.toml" ]; then
+          CARGO_HOME_LINE="CARGO_HOME = \"\${S}/.cargo\""
+        else
+          CARGO_HOME_LINE=""
+        fi
+        
         cat > ${{ env.PACKAGE_NAME }}_${{ env.PACKAGE_VERSION }}.bb <<-EOF
         inherit cargo_bin
 
@@ -77,7 +84,7 @@ runs:
         SRC_URI += "git://github.com/${{ github.repository }}.git;protocol=https;nobranch=1;branch=${{ github.ref_name }}"
         SRCREV = "${{ github.sha }}"
         S = "\${WORKDIR}/git"
-        CARGO_HOME = "\${S}/.cargo"
+        $CARGO_HOME_LINE
         LICENSE="CLOSED"
 
         include ${{ env.PACKAGE_NAME }}.inc
