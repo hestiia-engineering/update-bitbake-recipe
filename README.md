@@ -29,15 +29,16 @@ jobs:
 
 ## Inputs
 
-| Input              | Description                                                                            | Required | Default               |
-|--------------------|----------------------------------------------------------------------------------------|----------|-----------------------|
-| `git_token`        | Git Token with write permissions to the Yocto meta repository.                         | Yes      |                       |
-| `yocto_repository` | The name of the Yocto meta repository within the configured organization.              | Yes      |                       |
-| `yocto_branch`     | The branch of the Yocto meta repository to update.                                     | Yes      |                       |
-| `organization`     | The organization of the Yocto meta repository.                                         | Yes      |                       |
-| `recipe_path`      | The path to the folder in the Yocto meta repository where the recipe is located.       | Yes      |                       |
-| `author`           | The author of the pull request.                                                        | Yes      |                       |
-| `committer`        | The committer of the pull request.                                                     | Yes      |                       |
+| Input              | Description                                                                             | Required | Default               |
+|--------------------|-----------------------------------------------------------------------------------------|----------|-----------------------|
+| `git_token`        | Git Token with write permissions to the Yocto meta repository.                          | Yes      |                       |
+| `yocto_repository` | The name of the Yocto meta repository within the configured organization.               | Yes      |                       |
+| `yocto_branch`     | The branch of the Yocto meta repository to update.                                      | Yes      |                       |
+| `organization`     | The organization of the Yocto meta repository.                                          | Yes      |                       |
+| `recipe_path`      | The path to the folder in the Yocto meta repository where the recipe is located.        | Yes      |                       |
+| `author`           | The author of the pull request.                                                         | Yes      |                       |
+| `committer`        | The committer of the pull request.                                                      | Yes      |                       |
+| `method`           | The method to use for updating the BitBake recipe: 'cargo-bitbake' or 'meta-rust-bin'.  | No       | meta-rust-bin         |
 
 ## How It Works
 
@@ -53,7 +54,9 @@ This action performs the following steps:
    Extract the package name and version from the `Cargo.toml` file. Then it converts the package name (e.g. `resistive-core-regulator`) into a human-friendly title (e.g. `Resistive Core Regulator`).
 
 4. **Generate BitBake File:**  
-   Installs `cargo-bitbake` and generates the BitBake file.
+   If `meta-rust-bin` method is chosen, manually generate a BitBake file.
+   
+   If `cargo-bitbake` is chosen, installs `cargo-bitbake` and generates the BitBake file.
 
 5. **Checkout Yocto Meta Repository:**  
    Uses the provided `git_token` and repository details to check out the Yocto meta repository.

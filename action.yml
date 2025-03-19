@@ -22,6 +22,10 @@ inputs:
   committer:
     description: "The committer of the pull request."
     required: true
+  method:
+    description: "The method to use for updating the BitBake recipe: 'cargo-bitbake' or 'meta-rust-bin'."
+    default: "meta-rust-bin"
+    required: false
 runs:
   using: "composite"
   steps:
@@ -56,17 +60,28 @@ runs:
 
     # Generate the BitBake file using cargo bitbake.
     - name: Generate BitBake file
+      run-if: ${{ inputs.method == 'cargo-bitbake' }}
       run: |
         cargo install --locked cargo-bitbake
         cargo bitbake
+      shell: sh
 
-        # Remove git references to fix the recipe.
-        for BITBAKE_FILE in *.bb; do
-          sed -i '/git.*\\/d' "$BITBAKE_FILE"
-          sed -i '/SRCREV_FORMAT \.= "_/d' "$BITBAKE_FILE"
-          sed -i '/SRCREV_[^ ]* = "/d' "$BITBAKE_FILE"
-          sed -i '/EXTRA_OECARGO_PATHS \+= "\${WORKDIR}\/[^"]*"/d' "$BITBAKE_FILE"
-        done
+    - name: Generate BitBake file
+      run-if: ${{ inputs.method == 'meta-rust-bin' }}
+      run: |
+        cat >> ${{ env.PACKAGE_NAME }}_${{ env.PACKAGE_VERSION }}.bb <<EOF
+          inherit cargo_bin
+
+          do_compile[network] = "1"
+
+          SRC_URI += "git://github.com/${{ env.GITHUB_REPOSITORY }}.git;protocol=https;nobranch=1;branch=${{ env.GITHUB_BASE_REF }}"
+          SRCREV = "${{ env.GITHUB_SHA }}"
+          S = "${WORKDIR}/git"
+          CARGO_HOME = "${S}/.cargo"
+          LICENSE="CLOSED"
+
+          include ${{ env.PACKAGE_NAME }}.inc
+        EOF
       shell: sh
 
     # Check out the Yocto meta repository.
