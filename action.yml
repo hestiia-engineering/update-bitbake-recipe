@@ -60,14 +60,14 @@ runs:
 
     # Generate the BitBake file using cargo bitbake.
     - name: Generate BitBake file
-      run-if: ${{ inputs.method == 'cargo-bitbake' }}
+      if: inputs.method == 'cargo-bitbake'
       run: |
         cargo install --locked cargo-bitbake
         cargo bitbake
       shell: sh
 
     - name: Generate BitBake file
-      run-if: ${{ inputs.method == 'meta-rust-bin' }}
+      if: inputs.method == 'meta-rust-bin'
       run: |
         cat >> ${{ env.PACKAGE_NAME }}_${{ env.PACKAGE_VERSION }}.bb <<EOF
           inherit cargo_bin
