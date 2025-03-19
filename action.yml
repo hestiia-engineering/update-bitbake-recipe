@@ -70,17 +70,17 @@ runs:
       if: inputs.method == 'meta-rust-bin'
       run: |
         cat > ${{ env.PACKAGE_NAME }}_${{ env.PACKAGE_VERSION }}.bb <<-EOF
-          inherit cargo_bin
+        inherit cargo_bin
 
-          do_compile[network] = "1"
+        do_compile[network] = "1"
 
-          SRC_URI += "git://github.com/${{ github.repository }}.git;protocol=https;nobranch=1;branch=${{ github.ref_name }}"
-          SRCREV = "${{ github.sha }}"
-          S = "\${WORKDIR}/git"
-          CARGO_HOME = "\${S}/.cargo"
-          LICENSE="CLOSED"
+        SRC_URI += "git://github.com/${{ github.repository }}.git;protocol=https;nobranch=1;branch=${{ github.ref_name }}"
+        SRCREV = "${{ github.sha }}"
+        S = "\${WORKDIR}/git"
+        CARGO_HOME = "\${S}/.cargo"
+        LICENSE="CLOSED"
 
-          include ${{ env.PACKAGE_NAME }}.inc
+        include ${{ env.PACKAGE_NAME }}.inc
         EOF
       shell: sh
 
